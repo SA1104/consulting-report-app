@@ -304,12 +304,6 @@ export default function Dashboard() {
   };
 
   const handleAIGeneration = async () => {
-    if (!apiConfig.key) {
-      alert('AI API 키가 설정되지 않았습니다. 상단의 API 설정 메뉴에서 키를 입력해주세요.');
-      setIsSettingsOpen(true);
-      return;
-    }
-    
     setIsGenerating(true);
     try {
       const prompt = `다음은 어느 기업의 경영진단 체크리스트 결과 점수(100점 만점)입니다.
@@ -330,39 +324,29 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
   "opinion": "(계속기업으로 존속 가능성, 경영진의 혁신 의지 등을 종합적으로 반영한 컨설턴트 최종 의견)"
 }`;
 
-      let jsonStr = '';
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          clientKey: apiConfig.key,
+          clientProvider: apiConfig.provider
+        })
+      });
 
-      if (apiConfig.provider === 'gemini') {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiConfig.key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { response_mime_type: "application/json" }
-          })
-        });
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        jsonStr = data.candidates[0].content.parts[0].text;
-      } else {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiConfig.key}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [{ role: 'user', content: prompt }],
-            response_format: { type: "json_object" }
-          })
-        });
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.message);
-        jsonStr = data.choices[0].message.content;
+      const data = await res.json();
+      
+      if (!res.ok) {
+        if (res.status === 400) {
+          alert('API 키가 설정되지 않았습니다. 상단의 API 설정 메뉴에서 키를 입력하거나 관리자에게 문의하세요.');
+          setIsSettingsOpen(true);
+        } else {
+          throw new Error(data.error || '알 수 없는 오류');
+        }
+        return;
       }
 
-      const parsed = JSON.parse(jsonStr);
+      const parsed = JSON.parse(data.result);
       setFormData(prev => ({
         ...prev,
         aiInsights: parsed.insights || {},
