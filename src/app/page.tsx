@@ -363,34 +363,34 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans text-gray-900 print:h-auto print:block print:bg-white">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 print:h-auto print:block print:bg-white">
       {/* Sidebar */}
-      <div className="w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col print:hidden">
-        <div className="p-6 border-b border-gray-200">
+      <div className="w-full md:w-72 bg-white border-b md:border-b-0 md:border-r border-gray-200 shadow-sm flex flex-col print:hidden shrink-0">
+        <div className="p-4 md:p-6 border-b border-gray-200">
           <h1 className="text-xl font-bold text-blue-700 flex items-center gap-2">
             <LayoutDashboard className="w-6 h-6" />
             컨설팅 보고서
           </h1>
-          <p className="text-sm text-gray-500 mt-2">재창업·재도전지원</p>
+          <p className="text-sm text-gray-500 mt-1 md:mt-2">재창업·재도전지원</p>
         </div>
-        <div className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-1 px-3">
+        <div className="overflow-x-auto md:overflow-y-auto py-2 md:py-4 flex-none md:flex-1 custom-scrollbar">
+          <ul className="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-1 px-3 w-max md:w-auto">
             {steps.map((step, idx) => (
-              <li key={step.id}>
+              <li key={step.id} className="shrink-0">
                 <button
                   onClick={() => setCurrentStep(idx)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
+                  className={`w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 text-left rounded-lg transition-colors whitespace-nowrap ${
                     currentStep === idx 
                       ? 'bg-blue-50 text-blue-700 font-medium' 
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
-                  <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${
+                  <span className={`flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full text-xs shrink-0 ${
                     currentStep === idx ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
                   }`}>
                     {idx + 1}
                   </span>
-                  {step.title}
+                  <span className="text-sm md:text-base">{step.title}</span>
                 </button>
               </li>
             ))}
@@ -401,7 +401,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden print:overflow-visible print:block">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10 print:hidden">
+        <header className="h-auto md:h-16 bg-white border-b border-gray-200 flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-8 py-3 md:py-0 shadow-sm z-10 print:hidden gap-3 md:gap-0">
           <div className="flex items-center gap-4">
             <h2 className="text-lg font-semibold text-gray-800">
               {steps[currentStep].title}
@@ -413,21 +413,21 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
               </span>
             )}
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setIsPreviewOpen(true)} className="text-gray-500 hover:text-blue-600 flex items-center gap-2 text-sm font-medium transition-colors">
+          <div className="flex items-center flex-wrap gap-2 md:gap-4 w-full md:w-auto mt-2 md:mt-0">
+            <button onClick={() => setIsPreviewOpen(true)} className="text-gray-500 hover:text-blue-600 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium transition-colors">
               <Printer className="w-4 h-4" /> 인쇄 미리보기
             </button>
-            <button onClick={() => setIsSettingsOpen(true)} className="text-gray-500 hover:text-gray-700 flex items-center gap-2 text-sm font-medium">
+            <button onClick={() => setIsSettingsOpen(true)} className="text-gray-500 hover:text-gray-700 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium">
               <Settings className="w-4 h-4" /> API 설정
             </button>
-            <button onClick={() => setCurrentStep(7)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
+            <button onClick={() => setCurrentStep(7)} className="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors flex items-center gap-1.5 md:gap-2 shadow-sm ml-auto md:ml-0">
               <Download className="w-4 h-4" /> 저장 및 내보내기
             </button>
           </div>
         </header>
 
         {/* Content Area */}
-        <main ref={contentAreaRef} className="flex-1 overflow-y-auto p-8 scroll-smooth print:hidden">
+        <main ref={contentAreaRef} className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth print:hidden">
           <div className="max-w-5xl mx-auto space-y-8">
             
             {/* Step 0: Cover (Skipped here for brevity, assuming same as before) */}
