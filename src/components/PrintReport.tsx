@@ -132,13 +132,13 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 9, fontWeight: 'bold', paddingLeft: 50 }} />
-                  <Line name="자산" type="monotone" dataKey="assets" stroke="#94a3b8" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="자산" type="monotone" dataKey="assets" stroke="#94a3b8" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="assets" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#64748b" />
                   </Line>
-                  <Line name="부채" type="monotone" dataKey="liabilities" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="부채" type="monotone" dataKey="liabilities" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="liabilities" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#ef4444" />
                   </Line>
-                  <Line name="자본" type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="자본" type="monotone" dataKey="equity" stroke="#22c55e" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="equity" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#22c55e" />
                   </Line>
                 </LineChart>
@@ -155,13 +155,13 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 9, fontWeight: 'bold', paddingLeft: 50 }} />
-                  <Line name="매출액" type="monotone" dataKey="sales" stroke="#1e40af" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="매출액" type="monotone" dataKey="sales" stroke="#1e40af" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="sales" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#1e40af" />
                   </Line>
-                  <Line name="영업이익" type="monotone" dataKey="opIncome" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="영업이익" type="monotone" dataKey="opIncome" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="opIncome" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#f59e0b" />
                   </Line>
-                  <Line name="당기순이익" type="monotone" dataKey="netIncome" stroke="#06b6d4" strokeWidth={2} dot={{ r: 3 }}>
+                  <Line name="당기순이익" type="monotone" dataKey="netIncome" stroke="#06b6d4" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                     <LabelList dataKey="netIncome" position="top" formatter={(val: number) => val?.toLocaleString()} fontSize={12} fill="#06b6d4" />
                   </Line>
                 </LineChart>
@@ -223,16 +223,16 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
                 <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: 9, fontWeight: 'bold', paddingLeft: 50 }} />
-                <Line name="자기자본비율" type="monotone" dataKey="equityRatio" stroke="#1e40af" strokeWidth={2} dot={{ r: 3 }}>
+                <Line name="자기자본비율" type="monotone" dataKey="equityRatio" stroke="#1e40af" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="equityRatio" position="top" fontSize={12} fill="#1e40af" />
                 </Line>
-                <Line name="매출액순이익률" type="monotone" dataKey="preTaxMargin" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }}>
+                <Line name="매출액순이익률" type="monotone" dataKey="preTaxMargin" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="preTaxMargin" position="top" fontSize={12} fill="#3b82f6" />
                 </Line>
-                <Line name="부가가치율" type="monotone" dataKey="valueAdded" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }}>
+                <Line name="부가가치율" type="monotone" dataKey="valueAdded" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="valueAdded" position="top" fontSize={12} fill="#f59e0b" />
                 </Line>
-                <Line name="매출액증가율" type="monotone" dataKey="salesGrowth" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }}>
+                <Line name="매출액증가율" type="monotone" dataKey="salesGrowth" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="salesGrowth" position="top" fontSize={12} fill="#10b981" />
                 </Line>
               </LineChart>
@@ -323,7 +323,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 <PolarGrid />
                 <PolarAngleAxis dataKey="category" tick={{ fill: '#000', fontSize: 12, fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="진단 점수" dataKey="score" stroke="#1e40af" fill="#1e40af" fillOpacity={0.5} />
+                <Radar name="진단 점수" dataKey="score" stroke="#1e40af" fill="#1e40af" fillOpacity={0.5} isAnimationActive={false} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
