@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); const content = fs.readFileSync("src/app/page.tsx", "utf-8").split("\n"); const newContent = content.slice(0, 746).join("\n") + "\n" + fs.readFileSync("suffix.txt", "utf-8"); fs.writeFileSync("src/app/page.tsx", newContent, "utf-8");
