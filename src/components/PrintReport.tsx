@@ -389,7 +389,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
               </h2>
               <div className="w-full text-sm border-2 border-gray-800">
                 {/* Header Row */}
-                <div className="flex bg-gray-100 border-b-2 border-gray-800 font-bold">
+                <div className="flex bg-gray-100 border-b-2 border-gray-800 font-bold print:break-inside-avoid">
                   <div className="border-r border-gray-400 p-3 w-[15%] text-center flex items-center justify-center">진단항목</div>
                   <div className="border-r border-gray-400 p-3 w-[55%] text-center flex items-center justify-center">진단 체크리스트</div>
                   <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">V</div>
@@ -406,11 +406,11 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                   return (
                     <React.Fragment key={item.id}>
                       {showSubcategory && (
-                        <div className="bg-gray-200 border-b border-gray-400 p-2 font-bold text-gray-800">
+                        <div className="bg-gray-200 border-b border-gray-400 p-2 font-bold text-gray-800 print:break-inside-avoid print:break-after-avoid">
                           ■ {item.subcategory}
                         </div>
                       )}
-                      <div className="flex border-b border-gray-400 last:border-b-0">
+                      <div className="flex border-b border-gray-400 last:border-b-0 print:break-inside-avoid">
                         <div className="border-r border-gray-400 p-3 w-[15%] text-center font-medium flex items-center justify-center">{item.id}</div>
                         <div className="border-r border-gray-400 p-3 w-[55%] flex items-center">{item.question}</div>
                         {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map((val, vIdx) => (
@@ -435,7 +435,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-2">재창업패키지 지원사업 안내</h2>
         
         <div className="space-y-8">
-          <div>
+          <div className="print:break-inside-avoid">
             <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-800 inline-block"></span>
               1. 사업 개요
@@ -448,7 +448,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
             </div>
           </div>
 
-          <div>
+          <div className="print:break-inside-avoid">
             <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-800 inline-block"></span>
               2. 지원 내용
@@ -461,7 +461,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
             </div>
           </div>
 
-          <div>
+          <div className="print:break-inside-avoid">
             <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-800 inline-block"></span>
               3. 컨설팅 진행 절차
@@ -481,7 +481,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
             </div>
           </div>
 
-          <div>
+          <div className="print:break-inside-avoid">
             <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-800 inline-block"></span>
               4. 유의사항
@@ -494,7 +494,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
             </div>
           </div>
 
-          <div>
+          <div className="print:break-inside-avoid">
             <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-800 inline-block"></span>
               5. 문의처
