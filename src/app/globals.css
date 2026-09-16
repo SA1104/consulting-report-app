@@ -27,41 +27,18 @@ body {
 
 @media print {
   /* Reset all height and overflow constraints globally so pagination works flawlessly */
-  * {
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
-  }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
-  }
-  
-  /* Hide everything by default */
-  body * {
-    visibility: hidden;
-  }
-  
-  /* Show only the print report and its children */
-  #print-report, #print-report * {
-    visibility: visible;
-  }
-  
-  /* Reset the position of the print report so it flows naturally from the top */
-  #print-report {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   /* Ensure page breaks work */
   .page-break {
-    page-break-before: always;
-    break-before: page;
+    page-break-before: always !important;
+    break-before: page !important;
   }
 
   @page {
