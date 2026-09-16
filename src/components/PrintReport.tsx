@@ -387,45 +387,43 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
               <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
                 부문별 진단 체크리스트 - {cat}
               </h2>
-              <table className="w-full text-left border-collapse border-2 border-gray-800 text-sm">
-                <thead>
-                  <tr className="bg-gray-100 border-b-2 border-gray-800">
-                    <th className="border border-gray-400 p-3 w-[15%] text-center">진단항목</th>
-                    <th className="border border-gray-400 p-3 w-[55%] text-center">진단 체크리스트</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">V</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">G</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">N</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">B</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">W</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-center text-xs">제외</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <div className="w-full text-sm border-2 border-gray-800">
+                {/* Header Row */}
+                <div className="flex bg-gray-100 border-b-2 border-gray-800 font-bold">
+                  <div className="border-r border-gray-400 p-3 w-[15%] text-center flex items-center justify-center">진단항목</div>
+                  <div className="border-r border-gray-400 p-3 w-[55%] text-center flex items-center justify-center">진단 체크리스트</div>
+                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">V</div>
+                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">G</div>
+                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">N</div>
+                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">B</div>
+                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">W</div>
+                  <div className="p-2 w-[5%] text-center text-xs flex items-center justify-center">제외</div>
+                </div>
+                {/* Body Rows */}
+                <div className="flex flex-col">
                 {catItems.map((item, idx) => {
                   const showSubcategory = idx === 0 || catItems[idx - 1].subcategory !== item.subcategory;
                   return (
                     <React.Fragment key={item.id}>
                       {showSubcategory && (
-                        <tr className="bg-gray-100">
-                          <td colSpan={8} className="border border-gray-400 p-2 font-bold text-gray-800 bg-gray-200">
-                            ■ {item.subcategory}
-                          </td>
-                        </tr>
+                        <div className="bg-gray-200 border-b border-gray-400 p-2 font-bold text-gray-800">
+                          ■ {item.subcategory}
+                        </div>
                       )}
-                      <tr>
-                        <td className="border border-gray-400 p-3 text-center font-medium">{item.id}</td>
-                        <td className="border border-gray-400 p-3">{item.question}</td>
-                        {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map(val => (
-                          <td key={val} className="border border-gray-400 p-2 text-center align-middle font-bold text-blue-800">
+                      <div className="flex border-b border-gray-400 last:border-b-0">
+                        <div className="border-r border-gray-400 p-3 w-[15%] text-center font-medium flex items-center justify-center">{item.id}</div>
+                        <div className="border-r border-gray-400 p-3 w-[55%] flex items-center">{item.question}</div>
+                        {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map((val, vIdx) => (
+                          <div key={val} className={`${vIdx < 5 ? 'border-r border-gray-400' : ''} p-2 w-[5%] text-center font-bold text-blue-800 flex items-center justify-center`}>
                             {formData.checklistScores?.[item.id] === val ? '✓' : ''}
-                          </td>
+                          </div>
                         ))}
-                      </tr>
+                      </div>
                     </React.Fragment>
                   );
                 })}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
             <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
           </React.Fragment>
