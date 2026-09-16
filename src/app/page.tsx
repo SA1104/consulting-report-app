@@ -166,12 +166,80 @@ export default function Dashboard() {
   const results = calculateResults();
 
   const handleDownloadPDF = async () => {
-    // html2canvas fails with Tailwind v4 oklch colors. 
-    // Native browser print (Save as PDF) is much more reliable and produces vector PDFs.
+    // Use html2canvas + jsPDF to generate PDF directly, bypassing Chrome's buggy print engine
+    const html2canvas = (await import('html2canvas-pro')).default;
+    const { jsPDF } = await import('jspdf');
+
+    // Show preview so the PrintReport renders in DOM
     setIsPreviewOpen(true);
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    
+    // Wait for render
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const element = document.getElementById('print-report');
+    if (!element) { alert('인쇄 영역을 찾을 수 없습니다.'); return; }
+
+    try {
+      // Capture the entire report as a high-res canvas
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 794, // A4 width in px at 96dpi
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = 210; // A4 width mm
+      const pdfHeight = 297; // A4 height mm
+      const margin = 10;
+      const contentWidth = pdfWidth - margin * 2;
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = contentWidth / (imgWidth / 2); // scale=2 so divide by 2
+      const totalHeight = (imgHeight / 2) * ratio; // total content height in mm
+      
+      let position = 0;
+      let page = 0;
+      const pageContentHeight = pdfHeight - margin * 2;
+      
+      while (position < totalHeight) {
+        if (page > 0) pdf.addPage();
+        
+        // Calculate the source Y position on the canvas for this page
+        const sourceY = (position / ratio) * 2; // convert mm back to canvas pixels
+        const sourceHeight = Math.min((pageContentHeight / ratio) * 2, imgHeight - sourceY);
+        
+        // Create a temporary canvas for this page slice
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = imgWidth;
+        pageCanvas.height = sourceHeight;
+        const ctx = pageCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+        }
+        
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+        const pageImgHeight = (sourceHeight / 2) * ratio;
+        
+        pdf.addImage(pageImgData, 'JPEG', margin, margin, contentWidth, pageImgHeight);
+        
+        position += pageContentHeight;
+        page++;
+      }
+      
+      pdf.save(`컨설팅보고서_${formData.company || '기업명'}.pdf`);
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      alert('PDF 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+    
+    setIsPreviewOpen(false);
   };
 
   const handleDownloadWord = async () => {
@@ -1168,7 +1236,35 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
               인쇄 미리보기 (Print Preview)
             </h2>
             <div className="flex gap-4">
-              <button onClick={() => window.print()} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+              <button onClick={async () => {
+                const html2canvas = (await import('html2canvas-pro')).default;
+                const { jsPDF } = await import('jspdf');
+                const element = document.getElementById('print-report');
+                if (!element) return;
+                try {
+                  const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 794 });
+                  const pdf = new jsPDF('p', 'mm', 'a4');
+                  const pdfWidth = 210; const pdfHeight = 297; const margin = 10;
+                  const contentWidth = pdfWidth - margin * 2;
+                  const imgWidth = canvas.width; const imgHeight = canvas.height;
+                  const ratio = contentWidth / (imgWidth / 2);
+                  const totalHeight = (imgHeight / 2) * ratio;
+                  let position = 0; let page = 0;
+                  const pageContentHeight = pdfHeight - margin * 2;
+                  while (position < totalHeight) {
+                    if (page > 0) pdf.addPage();
+                    const sourceY = (position / ratio) * 2;
+                    const sourceHeight = Math.min((pageContentHeight / ratio) * 2, imgHeight - sourceY);
+                    const pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = imgWidth; pageCanvas.height = sourceHeight;
+                    const ctx = pageCanvas.getContext('2d');
+                    if (ctx) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height); ctx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight); }
+                    pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, contentWidth, (sourceHeight / 2) * ratio);
+                    position += pageContentHeight; page++;
+                  }
+                  pdf.save(`컨설팅보고서_${formData.company || '기업명'}.pdf`);
+                } catch (err) { console.error(err); alert('PDF 생성 중 오류가 발생했습니다.'); }
+              }} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                 <Printer className="w-4 h-4" /> 인쇄 / PDF 저장
               </button>
               <button onClick={() => setIsPreviewOpen(false)} className="text-gray-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors">
