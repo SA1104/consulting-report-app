@@ -217,6 +217,7 @@ export default function Dashboard() {
       }
       
       pdf.save(`컨설팅보고서_${formData.company || '수진기업'}.pdf`);
+      setIsPreviewOpen(false); // Close modal on success
     } catch (e) {
       console.error(e);
       alert('PDF 생성 중 오류가 발생했습니다.');
@@ -1261,21 +1262,37 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
         {/* SCREEN ONLY Print Preview Modal */}
         {isPreviewOpen && (
           <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex flex-col z-[100]">
-            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0">
+            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0 relative z-10">
               <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <Printer className="w-5 h-5 text-blue-600" />
                 인쇄 미리보기 (Print Preview)
               </h2>
               <div className="flex gap-4">
-                <button onClick={() => window.print()} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                  <Printer className="w-4 h-4" /> 인쇄 / PDF 저장
+                <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                  {isGeneratingPDF ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
+                  {isGeneratingPDF ? 'PDF 생성 중...' : '인쇄 / PDF 저장'}
                 </button>
-                <button onClick={() => setIsPreviewOpen(false)} className="text-gray-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors">
+                <button onClick={() => setIsPreviewOpen(false)} disabled={isGeneratingPDF} className="text-gray-500 hover:bg-gray-100 disabled:opacity-50 px-4 py-2 rounded-lg font-medium transition-colors">
                   닫기
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-8 bg-gray-500">
+            
+            <div className="flex-1 overflow-y-auto p-8 bg-gray-500 relative">
+              {/* Blocking Loading Overlay */}
+              {isGeneratingPDF && (
+                <div className="absolute inset-0 bg-gray-900 bg-opacity-50 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
+                  <div className="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full text-center">
+                    <Loader2 className="w-16 h-16 text-red-500 animate-spin mb-6" />
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">PDF 파일 생성 중</h3>
+                    <p className="text-gray-500">
+                      고해상도 이미지를 처리하고 있습니다.<br/>
+                      브라우저 사양에 따라 10~20초 정도 소요될 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               {/* Only shown on screen, NOT during actual print */}
               <PrintReport formData={formData} results={results} />
             </div>
