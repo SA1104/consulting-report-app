@@ -164,14 +164,65 @@ export default function Dashboard() {
   };
 
   const results = calculateResults();
+  
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleDownloadPDF = async () => {
-    // html2canvas fails with Tailwind v4 oklch colors. 
-    // Native browser print (Save as PDF) is much more reliable and produces vector PDFs.
     setIsPreviewOpen(true);
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    setIsGeneratingPDF(true);
+    
+    try {
+      const html2canvas = (await import('html2canvas-pro')).default;
+      const { jsPDF } = await import('jspdf');
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const element = document.getElementById('print-report');
+      if (!element) { 
+        alert('인쇄 영역을 찾을 수 없습니다.'); 
+        setIsGeneratingPDF(false);
+        return; 
+      }
+
+      const canvas = await html2canvas(element, {
+        scale: 1.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 794,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = pdfWidth / imgWidth;
+      const totalImgHeightInMm = imgHeight * ratio;
+      
+      let heightLeft = totalImgHeightInMm;
+      let position = 0;
+      
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgWidth * ratio);
+      heightLeft -= pdfHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - totalImgHeightInMm;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgWidth * ratio);
+        heightLeft -= pdfHeight;
+      }
+      
+      pdf.save(`컨설팅보고서_${formData.company || '수진기업'}.pdf`);
+    } catch (e) {
+      console.error(e);
+      alert('PDF 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   const handleDownloadWord = async () => {
@@ -1106,10 +1157,10 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                   </p>
                   
                   <div className="flex justify-center gap-6 pt-6">
-                    <button onClick={handleDownloadPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
-                      <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />
+                    <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isGeneratingPDF ? <Loader2 className="w-12 h-12 text-red-500 animate-spin" /> : <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />}
                       <div>
-                        <span className="block font-bold text-gray-800 text-lg">PDF 다운로드</span>
+                        <span className="block font-bold text-gray-800 text-lg">{isGeneratingPDF ? 'PDF 생성 중...' : 'PDF 다운로드'}</span>
                         <span className="block text-sm text-gray-500 mt-1">인쇄 및 최종 보고용</span>
                       </div>
                     </button>
