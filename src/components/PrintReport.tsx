@@ -403,21 +403,25 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 <tbody>
                 {catItems.map((item, idx) => {
                   const showSubcategory = idx === 0 || catItems[idx - 1].subcategory !== item.subcategory;
-                  const rowSpan = catItems.filter(c => c.subcategory === item.subcategory).length;
                   return (
-                    <tr key={item.id}>
+                    <React.Fragment key={item.id}>
                       {showSubcategory && (
-                        <td rowSpan={rowSpan} className="border border-gray-400 p-3 font-bold text-center align-middle bg-gray-50">
-                          {item.subcategory}
-                        </td>
+                        <tr className="bg-gray-100">
+                          <td colSpan={8} className="border border-gray-400 p-2 font-bold text-gray-800 bg-gray-200">
+                            ■ {item.subcategory}
+                          </td>
+                        </tr>
                       )}
-                      <td className="border border-gray-400 p-3">{item.question}</td>
-                      {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map(val => (
-                        <td key={val} className="border border-gray-400 p-2 text-center align-middle font-bold text-blue-800">
-                          {formData.checklistScores?.[item.id] === val ? '✓' : ''}
-                        </td>
-                      ))}
-                    </tr>
+                      <tr>
+                        <td className="border border-gray-400 p-3 text-center font-medium">{item.id}</td>
+                        <td className="border border-gray-400 p-3">{item.question}</td>
+                        {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map(val => (
+                          <td key={val} className="border border-gray-400 p-2 text-center align-middle font-bold text-blue-800">
+                            {formData.checklistScores?.[item.id] === val ? '✓' : ''}
+                          </td>
+                        ))}
+                      </tr>
+                    </React.Fragment>
                   );
                 })}
                 </tbody>
