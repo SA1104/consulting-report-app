@@ -827,361 +827,414 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                       <tr className="bg-gray-50">
                         <th className="border border-gray-200 p-3 w-[15%]">진단항목</th>
                         <th className="border border-gray-200 p-3 w-[55%]">진단 체크리스트</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">V (5)</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">G (4)</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">N (3)</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">B (2)</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">W (1)</th>
-                        <th className="border border-gray-200 p-3 w-[5%] text-center">제외</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentChecklistItems.map((item, idx) => {
-                        const showSubcategory = idx === 0 || currentChecklistItems[idx - 1].subcategory !== item.subcategory;
-                        const rowSpan = currentChecklistItems.filter(c => c.subcategory === item.subcategory).length;
-                        
-                        return (
-                          <tr key={item.id} className="hover:bg-blue-50/30 transition-colors">
-                            {showSubcategory && (
-                              <td rowSpan={rowSpan} className="border border-gray-200 p-3 font-medium text-gray-700 align-middle text-center bg-gray-50/50">
-                                {item.subcategory}
-                              </td>
-                            )}
-                            <td className="border border-gray-200 p-3 text-gray-700">{item.question}</td>
-                            
-                            {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map(val => (
-                              <td key={val} className="border border-gray-200 p-3 text-center align-middle cursor-pointer" onClick={() => handleScoreChange(item.id, val)}>
-                                <div className="flex items-center justify-center w-full h-full">
-                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                    formData.checklistScores[item.id] === val 
-                                      ? 'border-blue-600 bg-blue-600' 
-                                      : 'border-gray-300 hover:border-blue-400'
-                                  }`}>
-                                    {formData.checklistScores[item.id] === val && <div className="w-2 h-2 rounded-full bg-white" />}
-                                  </div>
-                                </div>
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="p-6 space-y-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-2">제품(품질 및 가격) 측면</label>
+                      <textarea value={formData.productCapability} onChange={e => setFormData({...formData, productCapability: e.target.value})} className="w-full h-32 p-4 border border-gray-300 rounded-md resize-y focus:ring-blue-500" placeholder="제품의 경쟁력, 가격 정책, 품질 수준 등을 입력하세요..."></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-2">기술력 측면</label>
+                      <textarea value={formData.techCapability} onChange={e => setFormData({...formData, techCapability: e.target.value})} className="w-full h-32 p-4 border border-gray-300 rounded-md resize-y focus:ring-blue-500" placeholder="보유 기술, 특허, R&D 역량 등을 입력하세요..."></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-800 mb-2">대표자 경영능력 측면</label>
+                      <textarea value={formData.ceoCapability} onChange={e => setFormData({...formData, ceoCapability: e.target.value})} className="w-full h-32 p-4 border border-gray-300 rounded-md resize-y focus:ring-blue-500" placeholder="대표자의 경력, 리더십, 혁신 의지 등을 입력하세요..."></textarea>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Checklist */}
+              {currentStep === 4 && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                    {categories.map(cat => {
+                      const isComplete = checklistData.filter(c => c.category === cat).every(item => formData.checklistScores[item.id] !== undefined);
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => setChecklistCategory(cat)}
+                          className={`px-6 py-4 font-bold whitespace-nowrap transition-colors flex items-center gap-2 ${
+                            checklistCategory === cat 
+                              ? 'bg-white text-blue-600 border-b-2 border-blue-600' 
+                              : 'text-gray-500 hover:bg-gray-100 hover:text-gray-800'
+                          }`}
+                        >
+                          {cat}
+                          {isComplete && <span className="w-2 h-2 rounded-full bg-green-500"></span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="p-0 overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="p-3 text-sm font-semibold text-gray-600 w-16 text-center">No.</th>
+                          <th className="p-3 text-sm font-semibold text-gray-600">진단 문항</th>
+                          {['V', 'G', 'N', 'B', 'W', 'X'].map(val => (
+                            <th key={val} className="p-3 text-sm font-semibold text-gray-600 w-12 text-center" title={{V: '매우우수 (5)', G: '우수 (4)', N: '보통 (3)', B: '취약 (2)', W: '매우취약 (1)', X: '해당없음'}[val]}>
+                              {val}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentChecklistItems.map((item, idx) => {
+                          const showSubcategory = idx === 0 || currentChecklistItems[idx - 1].subcategory !== item.subcategory;
+                          return (
+                            <React.Fragment key={item.id}>
+                              {showSubcategory && (
+                                <tr className="bg-blue-50/50">
+                                  <td colSpan={8} className="p-3 font-bold text-blue-900 border-y border-gray-200">
+                                    ■ {item.subcategory}
+                                  </td>
+                                </tr>
+                              )}
+                              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                                <td className="p-3 text-center text-sm font-medium text-gray-500">{item.id}</td>
+                                <td className="p-3 text-sm text-gray-800">{item.question}</td>
+                                {(['V', 'G', 'N', 'B', 'W', 'X'] as Score[]).map(val => (
+                                  <td key={val} className="p-2 text-center">
+                                    <label className="flex items-center justify-center w-full h-full cursor-pointer">
+                                      <input 
+                                        type="radio" 
+                                        name={`score-${item.id}`} 
+                                        value={val}
+                                        checked={formData.checklistScores[item.id] === val}
+                                        onChange={() => handleScoreChange(item.id, val)}
+                                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                      />
+                                    </label>
+                                  </td>
+                                ))}
+                              </tr>
+                            </React.Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                   
                   {!isChecklistComplete && (
-                    <p className="text-red-500 text-sm font-medium mt-4 text-center">
+                    <p className="text-red-500 text-sm font-medium mt-4 text-center pb-4">
                       해당 부문의 모든 체크리스트를 선택해주세요. ({currentChecklistItems.filter(item => formData.checklistScores[item.id] === undefined).length}개 미완료)
                     </p>
                   )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Step 5: Results */}
-            {currentStep === 5 && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                  <div className="border-b border-gray-200 bg-gray-50 px-6 py-4"><h3 className="text-lg font-medium text-gray-800">부문별 경영진단 결과</h3></div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Score Table */}
-                    <div>
-                      <table className="w-full text-center border-collapse border border-gray-200">
+              {/* Step 6: Results */}
+              {currentStep === 5 && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 bg-gray-50 px-6 py-4"><h3 className="text-lg font-medium text-gray-800">부문별 경영진단 결과</h3></div>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Score Table */}
+                      <div>
+                        <table className="w-full text-center border-collapse border border-gray-200">
+                          <thead>
+                            <tr className="bg-gray-50">
+                              <th className="border border-gray-200 p-2">부 문</th>
+                              <th className="border border-gray-200 p-2">평 점</th>
+                              <th className="border border-gray-200 p-2">등 급</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {results.map((r, i) => (
+                              <tr key={i}>
+                                <td className="border border-gray-200 p-2 font-medium">{r.category}</td>
+                                <td className="border border-gray-200 p-2">{r.score > 0 ? r.score : '-'}</td>
+                                <td className="border border-gray-200 p-2 font-bold text-blue-700">{r.score > 0 ? r.grade : '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {/* Radar Chart */}
+                      <div className="bg-gray-50 rounded-lg flex items-center justify-center min-h-[300px]">
+                        <ResponsiveContainer width="100%" height={300}>
+                          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={results}>
+                            <PolarGrid />
+                            <PolarAngleAxis dataKey="category" />
+                            <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                            <Radar name="진단 점수" dataKey="score" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                            <Tooltip />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 flex justify-between items-center">
+                      <h3 className="text-lg font-medium text-gray-800">핵심 이슈 도출(시사점) 및 경영 개선 방안</h3>
+                      <button onClick={handleAIGeneration} disabled={isGenerating} className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+                        {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        {isGenerating ? 'AI가 작성 중...' : 'AI 자동 초안 작성'}
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-6">
+                      <table className="w-full text-left border-collapse border border-gray-200 text-sm">
                         <thead>
                           <tr className="bg-gray-50">
-                            <th className="border border-gray-200 p-2">부 문</th>
-                            <th className="border border-gray-200 p-2">평 점</th>
-                            <th className="border border-gray-200 p-2">등 급</th>
+                            <th className="border border-gray-200 p-3 w-1/4">부 문</th>
+                            <th className="border border-gray-200 p-3 w-3/4">진단결과 및 핵심 이슈 도출(시사점)</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {results.map((r, i) => (
-                            <tr key={i}>
-                              <td className="border border-gray-200 p-2 font-medium">{r.category}</td>
-                              <td className="border border-gray-200 p-2">{r.score > 0 ? r.score : '-'}</td>
-                              <td className="border border-gray-200 p-2 font-bold text-blue-700">{r.score > 0 ? r.grade : '-'}</td>
+                          {categories.map(cat => (
+                            <tr key={cat}>
+                              <td className="border border-gray-200 p-3 font-medium text-center align-middle">{cat} 부문</td>
+                              <td className="border border-gray-200 p-0">
+                                <textarea 
+                                  className="w-full h-full min-h-[80px] p-3 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-500 resize-y" 
+                                  placeholder="내용을 입력하세요..." 
+                                  value={formData.aiInsights[cat] || ''}
+                                  onChange={e => setFormData({...formData, aiInsights: {...formData.aiInsights, [cat]: e.target.value}})}
+                                />
+                              </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                    </div>
-                    
-                    {/* Radar Chart */}
-                    <div className="bg-gray-50 rounded-lg flex items-center justify-center min-h-[300px]">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={results}>
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="category" />
-                          <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                          <Radar name="진단 점수" dataKey="score" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                          <Tooltip />
-                        </RadarChart>
-                      </ResponsiveContainer>
+                      
+                      <div>
+                        <label className="block text-sm font-bold text-gray-800 mb-2">경영개선 과제 선정 및 실행방안 (Page 6)</label>
+                        <p className="text-xs text-gray-500 mb-2">(각 부문별 핵심 이슈에 대한 개선과제 및 구체적인 개선방안 도출)</p>
+                        <textarea 
+                          className="w-full p-4 border border-gray-300 rounded-md min-h-[200px] focus:ring-blue-500 focus:border-blue-500" 
+                          placeholder="내용을 입력하세요..." 
+                          value={formData.aiTasks}
+                          onChange={e => setFormData({...formData, aiTasks: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-bold text-gray-800 mb-2">종합 의견 (Page 6)</label>
+                        <p className="text-xs text-gray-500 mb-2">(계속기업으로 존속 가능성, 자구계획 목표 수준, 경영진의 혁신 의지 등을 반영한 컨설턴트의 최종 의견)</p>
+                        <textarea 
+                          className="w-full p-4 border border-gray-300 rounded-md min-h-[150px] focus:ring-blue-500 focus:border-blue-500" 
+                          placeholder="내용을 입력하세요..." 
+                          value={formData.aiOpinion}
+                          onChange={e => setFormData({...formData, aiOpinion: e.target.value})}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              )}
 
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                  <div className="border-b border-gray-200 bg-gray-50 px-6 py-4 flex justify-between items-center">
-                    <h3 className="text-lg font-medium text-gray-800">핵심 이슈 도출(시사점) 및 경영 개선 방안</h3>
-                    <button onClick={handleAIGeneration} disabled={isGenerating} className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
-                      {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                      {isGenerating ? 'AI가 작성 중...' : 'AI 자동 초안 작성'}
+              {/* Step 7: Guide Pages (13~15p) */}
+              {currentStep === 6 && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-3">재창업패키지 지원사업 안내</h2>
+                    
+                    <div className="space-y-8">
+                      <div>
+                        <h3 className="text-lg font-bold text-blue-800 mb-3">1. 사업 개요</h3>
+                        <div className="bg-gray-50 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
+                          <p>• <strong>사업 목적:</strong> 사업실패 경험이 있는 (예비)재창업자의 재기를 지원하여 재도전 문화 확산 및 경제 활력 제고</p>
+                          <p>• <strong>지원 대상:</strong> 사업실패 경험이 있는 (예비)재창업자 또는 재창업 기업 (업력 7년 이내)</p>
+                          <p>• <strong>지원 규모:</strong> 재창업사업화 자금 최대 1억원 (업력 3년 이상 최대 2억원)</p>
+                          <p>• <strong>지원 기간:</strong> 협약일로부터 12개월 이내 (최대 18개월까지 연장 가능)</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-blue-800 mb-3">2. 지원 내용</h3>
+                        <div className="bg-gray-50 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
+                          <p>• <strong>재창업사업화:</strong> 시제품 제작, 지식재산권 취득, 마케팅 활동 등 재창업 사업화에 소요되는 자금 지원</p>
+                          <p>• <strong>재기교육:</strong> 실패원인 분석, 재창업 역량 강화를 위한 맞춤형 교육 프로그램 제공</p>
+                          <p>• <strong>멘토링:</strong> 분야별 전문가 매칭을 통한 1:1 밀착 멘토링 제공</p>
+                          <p>• <strong>컨설팅:</strong> 경영, 기술, 법률, 회계 등 재창업 전 과정에 필요한 전문 컨설팅 지원</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-blue-800 mb-3">3. 컨설팅 진행 절차</h3>
+                        <div className="flex items-center justify-between bg-gray-50 rounded-lg p-6">
+                          {['수요조사\n및 접수', '컨설턴트\n매칭', '현장방문\n진단', '보고서\n작성', '결과\n피드백'].map((step, i) => (
+                            <React.Fragment key={i}>
+                              <div className="flex flex-col items-center gap-2">
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                                  i <= 3 ? 'bg-blue-600' : 'bg-gray-400'
+                                }`}>{i + 1}</div>
+                                <span className="text-xs text-center font-medium whitespace-pre-line">{step}</span>
+                              </div>
+                              {i < 4 && <ChevronRight className="w-6 h-6 text-gray-300" />}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-blue-800 mb-3">4. 유의사항</h3>
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
+                          <p>• 본 컨설팅 보고서는 「중소벤처기업부 재창업패키지 지원사업」의 일환으로 작성되었습니다.</p>
+                          <p>• 보고서 내용은 수진기업이 제공한 자료 및 현장 인터뷰를 기반으로 작성되며, 제공된 자료의 진위여부에 대한 책임은 수진기업에 있습니다.</p>
+                          <p>• 경영진단 결과는 참고 목적이며, 최종 의사결정은 경영자의 판단에 따릅니다.</p>
+                          <p>• 본 보고서의 무단 복제 및 배포를 금합니다.</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-blue-800 mb-3">5. 문의처</h3>
+                        <div className="bg-gray-50 rounded-lg p-6 text-sm leading-relaxed">
+                          <p>• <strong>중소벤처기업부 재도전종합지원센터:</strong> 1357 (중소기업 통합콜센터)</p>
+                          <p>• <strong>재창업패키지 전담기관:</strong> 중소벤처기업진흥공단</p>
+                          <p>• <strong>홈페이지:</strong> www.k-startup.go.kr</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 8: Export */}
+              {currentStep === 7 && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center space-y-6">
+                  <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Download className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">모든 작성이 완료되었습니다!</h3>
+                  <p className="text-gray-500 max-w-lg mx-auto">
+                    입력하신 데이터를 바탕으로 컨설팅 보고서가 준비되었습니다.<br/>원하시는 포맷을 선택하여 문서를 다운로드하세요.
+                  </p>
+                  
+                  <div className="flex justify-center gap-6 pt-6">
+                    <button onClick={handleDownloadPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
+                      <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />
+                      <div>
+                        <span className="block font-bold text-gray-800 text-lg">PDF 다운로드</span>
+                        <span className="block text-sm text-gray-500 mt-1">인쇄 및 최종 보고용</span>
+                      </div>
+                    </button>
+                    <button onClick={handleDownloadWord} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
+                      <FileText className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />
+                      <div>
+                        <span className="block font-bold text-gray-800 text-lg">Word 다운로드</span>
+                        <span className="block text-sm text-gray-500 mt-1">추가 편집 및 수정용</span>
+                      </div>
                     </button>
                   </div>
-                  <div className="p-6 space-y-6">
-                    <table className="w-full text-left border-collapse border border-gray-200 text-sm">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="border border-gray-200 p-3 w-1/4">부 문</th>
-                          <th className="border border-gray-200 p-3 w-3/4">진단결과 및 핵심 이슈 도출(시사점)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {categories.map(cat => (
-                          <tr key={cat}>
-                            <td className="border border-gray-200 p-3 font-medium text-center align-middle">{cat} 부문</td>
-                            <td className="border border-gray-200 p-0">
-                              <textarea 
-                                className="w-full h-full min-h-[80px] p-3 border-0 focus:ring-2 focus:ring-inset focus:ring-blue-500 resize-y" 
-                                placeholder="내용을 입력하세요..." 
-                                value={formData.aiInsights[cat] || ''}
-                                onChange={e => setFormData({...formData, aiInsights: {...formData.aiInsights, [cat]: e.target.value}})}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-2">경영개선 과제 선정 및 실행방안 (Page 6)</label>
-                      <p className="text-xs text-gray-500 mb-2">(각 부문별 핵심 이슈에 대한 개선과제 및 구체적인 개선방안 도출)</p>
-                      <textarea 
-                        className="w-full p-4 border border-gray-300 rounded-md min-h-[200px] focus:ring-blue-500 focus:border-blue-500" 
-                        placeholder="내용을 입력하세요..." 
-                        value={formData.aiTasks}
-                        onChange={e => setFormData({...formData, aiTasks: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-bold text-gray-800 mb-2">종합 의견 (Page 6)</label>
-                      <p className="text-xs text-gray-500 mb-2">(계속기업으로 존속 가능성, 자구계획 목표 수준, 경영진의 혁신 의지 등을 반영한 컨설턴트의 최종 의견)</p>
-                      <textarea 
-                        className="w-full p-4 border border-gray-300 rounded-md min-h-[150px] focus:ring-blue-500 focus:border-blue-500" 
-                        placeholder="내용을 입력하세요..." 
-                        value={formData.aiOpinion}
-                        onChange={e => setFormData({...formData, aiOpinion: e.target.value})}
-                      />
-                    </div>
-                  </div>
                 </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center pt-4">
+                <button 
+                  onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                  disabled={currentStep === 0}
+                  className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+                >
+                  이전 단계
+                </button>
+                <button 
+                  onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+                  disabled={currentStep === steps.length - 1}
+                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
+                >
+                  다음 단계 <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            )}
 
-            {/* Step 6: Guide Pages (13~15p) */}
-            {currentStep === 6 && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-3">재창업패키지 지원사업 안내</h2>
-                  
-                  <div className="space-y-8">
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-800 mb-3">1. 사업 개요</h3>
-                      <div className="bg-gray-50 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
-                        <p>• <strong>사업 목적:</strong> 사업실패 경험이 있는 (예비)재창업자의 재기를 지원하여 재도전 문화 확산 및 경제 활력 제고</p>
-                        <p>• <strong>지원 대상:</strong> 사업실패 경험이 있는 (예비)재창업자 또는 재창업 기업 (업력 7년 이내)</p>
-                        <p>• <strong>지원 규모:</strong> 재창업사업화 자금 최대 1억원 (업력 3년 이상 최대 2억원)</p>
-                        <p>• <strong>지원 기간:</strong> 협약일로부터 12개월 이내 (최대 18개월까지 연장 가능)</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-800 mb-3">2. 지원 내용</h3>
-                      <div className="bg-gray-50 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
-                        <p>• <strong>재창업사업화:</strong> 시제품 제작, 지식재산권 취득, 마케팅 활동 등 재창업 사업화에 소요되는 자금 지원</p>
-                        <p>• <strong>재기교육:</strong> 실패원인 분석, 재창업 역량 강화를 위한 맞춤형 교육 프로그램 제공</p>
-                        <p>• <strong>멘토링:</strong> 분야별 전문가 매칭을 통한 1:1 밀착 멘토링 제공</p>
-                        <p>• <strong>컨설팅:</strong> 경영, 기술, 법률, 회계 등 재창업 전 과정에 필요한 전문 컨설팅 지원</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-800 mb-3">3. 컨설팅 진행 절차</h3>
-                      <div className="flex items-center justify-between bg-gray-50 rounded-lg p-6">
-                        {['수요조사\n및 접수', '컨설턴트\n매칭', '현장방문\n진단', '보고서\n작성', '결과\n피드백'].map((step, i) => (
-                          <React.Fragment key={i}>
-                            <div className="flex flex-col items-center gap-2">
-                              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                                i <= 3 ? 'bg-blue-600' : 'bg-gray-400'
-                              }`}>{i + 1}</div>
-                              <span className="text-xs text-center font-medium whitespace-pre-line">{step}</span>
-                            </div>
-                            {i < 4 && <ChevronRight className="w-6 h-6 text-gray-300" />}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-800 mb-3">4. 유의사항</h3>
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-3 text-sm leading-relaxed">
-                        <p>• 본 컨설팅 보고서는 「중소벤처기업부 재창업패키지 지원사업」의 일환으로 작성되었습니다.</p>
-                        <p>• 보고서 내용은 수진기업이 제공한 자료 및 현장 인터뷰를 기반으로 작성되며, 제공된 자료의 진위여부에 대한 책임은 수진기업에 있습니다.</p>
-                        <p>• 경영진단 결과는 참고 목적이며, 최종 의사결정은 경영자의 판단에 따릅니다.</p>
-                        <p>• 본 보고서의 무단 복제 및 배포를 금합니다.</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-bold text-blue-800 mb-3">5. 문의처</h3>
-                      <div className="bg-gray-50 rounded-lg p-6 text-sm leading-relaxed">
-                        <p>• <strong>중소벤처기업부 재도전종합지원센터:</strong> 1357 (중소기업 통합콜센터)</p>
-                        <p>• <strong>재창업패키지 전담기관:</strong> 중소벤처기업진흥공단</p>
-                        <p>• <strong>홈페이지:</strong> www.k-startup.go.kr</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 7: Export */}
-            {currentStep === 7 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center space-y-6">
-                <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Download className="w-10 h-10" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">모든 작성이 완료되었습니다!</h3>
-                <p className="text-gray-500 max-w-lg mx-auto">
-                  입력하신 데이터를 바탕으로 컨설팅 보고서가 준비되었습니다.<br/>원하시는 포맷을 선택하여 문서를 다운로드하세요.
-                </p>
-                
-                <div className="flex justify-center gap-6 pt-6">
-                  <button onClick={handleDownloadPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
-                    <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="block font-bold text-gray-800 text-lg">PDF 다운로드</span>
-                      <span className="block text-sm text-gray-500 mt-1">인쇄 및 최종 보고용</span>
-                    </div>
-                  </button>
-                  <button onClick={handleDownloadWord} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
-                    <FileText className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />
-                    <div>
-                      <span className="block font-bold text-gray-800 text-lg">Word 다운로드</span>
-                      <span className="block text-sm text-gray-500 mt-1">추가 편집 및 수정용</span>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between items-center pt-4">
-              <button 
-                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                disabled={currentStep === 0}
-                className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-              >
-                이전 단계
-              </button>
-              <button 
-                onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
-                disabled={currentStep === steps.length - 1}
-                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
-              >
-                다음 단계 <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
+          </main>
+        </div>
 
+        {/* API Settings Modal */}
+        {isSettingsOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-gray-600" />
+                  AI API 설정
+                </h3>
+                <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
+                  <span className="text-2xl leading-none">&times;</span>
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">API 제공자</label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="provider" value="gemini" checked={apiConfig.provider === 'gemini'} onChange={(e) => setApiConfig({...apiConfig, provider: e.target.value})} className="text-blue-600 focus:ring-blue-500" />
+                      <span>Google Gemini</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="provider" value="openai" checked={apiConfig.provider === 'openai'} onChange={(e) => setApiConfig({...apiConfig, provider: e.target.value})} className="text-blue-600 focus:ring-blue-500" />
+                      <span>OpenAI (ChatGPT)</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">API 키 (API Key)</label>
+                  <input 
+                    type="password" 
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                    placeholder={apiConfig.provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
+                    value={apiConfig.key}
+                    onChange={(e) => setApiConfig({...apiConfig, key: e.target.value})}
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    * 입력하신 API 키는 브라우저 내부에만 안전하게 저장되며 외부 서버로 전송되지 않습니다.
+                  </p>
+                </div>
+              </div>
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button onClick={() => setIsSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                  취소
+                </button>
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('consulting_api_key', apiConfig.key);
+                    localStorage.setItem('consulting_api_provider', apiConfig.provider);
+                    setIsSettingsOpen(false);
+                    alert('API 설정이 저장되었습니다.');
+                  }} 
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  저장하기
+                </button>
+              </div>
+            </div>
           </div>
-        </main>
+        )}
+
+        {/* SCREEN ONLY Print Preview Modal */}
+        {isPreviewOpen && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex flex-col z-[100]">
+            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0">
+              <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <Printer className="w-5 h-5 text-blue-600" />
+                인쇄 미리보기 (Print Preview)
+              </h2>
+              <div className="flex gap-4">
+                <button onClick={() => window.print()} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                  <Printer className="w-4 h-4" /> 인쇄 / PDF 저장
+                </button>
+                <button onClick={() => setIsPreviewOpen(false)} className="text-gray-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors">
+                  닫기
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-8 bg-gray-500">
+              {/* Only shown on screen, NOT during actual print */}
+              <PrintReport formData={formData} results={results} />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* API Settings Modal */}
-      {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-[500px] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-gray-600" />
-                AI API 설정
-              </h3>
-              <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <span className="text-2xl leading-none">&times;</span>
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">API 제공자</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="provider" value="gemini" checked={apiConfig.provider === 'gemini'} onChange={(e) => setApiConfig({...apiConfig, provider: e.target.value})} className="text-blue-600 focus:ring-blue-500" />
-                    <span>Google Gemini</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="provider" value="openai" checked={apiConfig.provider === 'openai'} onChange={(e) => setApiConfig({...apiConfig, provider: e.target.value})} className="text-blue-600 focus:ring-blue-500" />
-                    <span>OpenAI (ChatGPT)</span>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">API 키 (API Key)</label>
-                <input 
-                  type="password" 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" 
-                  placeholder={apiConfig.provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
-                  value={apiConfig.key}
-                  onChange={(e) => setApiConfig({...apiConfig, key: e.target.value})}
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  * 입력하신 API 키는 브라우저 내부에만 안전하게 저장되며 외부 서버로 전송되지 않습니다.
-                </p>
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-              <button onClick={() => setIsSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                취소
-              </button>
-              <button 
-                onClick={() => {
-                  localStorage.setItem('consulting_api_key', apiConfig.key);
-                  localStorage.setItem('consulting_api_provider', apiConfig.provider);
-                  setIsSettingsOpen(false);
-                  alert('API 설정이 저장되었습니다.');
-                }} 
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                저장하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Print Preview Modal */}
-      {isPreviewOpen && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex flex-col z-[100] print:relative print:bg-white print:inset-auto print:block">
-          <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0 print:hidden">
-            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <Printer className="w-5 h-5 text-blue-600" />
-              인쇄 미리보기 (Print Preview)
-            </h2>
-            <div className="flex gap-4">
-              <button onClick={() => window.print()} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                <Printer className="w-4 h-4" /> 인쇄 / PDF 저장
-              </button>
-              <button onClick={() => setIsPreviewOpen(false)} className="text-gray-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors">
-                닫기
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-8 bg-gray-500 print:overflow-visible print:p-0 print:bg-white print:block">
-            <PrintReport formData={formData} results={results} />
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-}
+      {/* PRINT ONLY LAYOUT */}
+      {/* This entirely bypasses all Tailwind flexbox deeply nested wrappers and renders PrintReport at the DOM root during printing */}
+      <div className="hidden print:block w-full bg-white m-0 p-0 absolute inset-0">
+        <PrintReport formData={formData} results={results} />
+      </div>
+    </>

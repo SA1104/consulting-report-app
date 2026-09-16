@@ -44,4 +44,21 @@ body {
   @page {
     margin: 10mm;
   }
+
+  /* Remove min-height from major containers during print to prevent LayoutNG crash */
+  .print-page-container {
+    min-height: 0 !important;
+  }
+  
+  /* Make sure rows do not break and do not crash */
+  .checklist-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Make sure charts don't break */
+  .recharts-wrapper {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
 }

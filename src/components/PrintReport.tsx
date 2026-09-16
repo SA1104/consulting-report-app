@@ -34,7 +34,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 2: Overview */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">1. 기업 개요 및 재무현황</h2>
         
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
@@ -175,7 +175,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 3: Ratios & Environment */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
           <span className="w-2 h-2 bg-blue-800 inline-block"></span>
           주요 재무비율
@@ -262,7 +262,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 4: Internal Capabilities */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 mt-4">
           <span className="w-2 h-2 bg-blue-800 inline-block"></span>
           내부역량 분석
@@ -289,7 +289,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 5: Checklist Results */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">3. 경영진단 결과 및 개선방안</h2>
         
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
@@ -358,7 +358,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 6: Final Opinions */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 mt-4">
           <span className="w-2 h-2 bg-blue-800 inline-block"></span>
           경영개선 과제 선정 및 실행방안
@@ -383,7 +383,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         const catItems = checklistData.filter(c => c.category === cat);
         return (
           <React.Fragment key={cat}>
-            <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+            <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
               <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
                 부문별 진단 체크리스트 - {cat}
               </h2>
@@ -410,7 +410,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                           ■ {item.subcategory}
                         </div>
                       )}
-                      <div className="flex border-b border-gray-400 last:border-b-0 print:break-inside-avoid">
+                      <div className="flex border-b border-gray-400 last:border-b-0 print:break-inside-avoid checklist-row">
                         <div className="border-r border-gray-400 p-3 w-[15%] text-center font-medium flex items-center justify-center">{item.id}</div>
                         <div className="border-r border-gray-400 p-3 w-[55%] flex items-center">{item.question}</div>
                         {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map((val, vIdx) => (
@@ -431,7 +431,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       })}
 
       {/* Page 13: Guide Page */}
-      <div className="min-h-[270mm] print:min-h-0 print:h-auto p-2 box-border">
+      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-2">재창업패키지 지원사업 안내</h2>
         
         <div className="space-y-8">
