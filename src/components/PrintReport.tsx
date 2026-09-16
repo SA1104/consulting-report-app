@@ -31,7 +31,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         </div>
       </div>
 
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 2: Overview */}
       <div className="min-h-[270mm] p-2 box-border">
@@ -172,7 +172,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         </div>
       </div>
 
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 3: Ratios & Environment */}
       <div className="min-h-[270mm] p-2 box-border">
@@ -259,7 +259,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
           <div className="p-4 whitespace-pre-wrap min-h-[150px]">{formData.fiveForce || '내용 없음'}</div>
         </div>
       </div>
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 4: Internal Capabilities */}
       <div className="min-h-[270mm] p-2 box-border">
@@ -286,7 +286,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         </div>
       </div>
 
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 5: Checklist Results */}
       <div className="min-h-[270mm] p-2 box-border">
@@ -355,7 +355,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         </table>
       </div>
 
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 6: Final Opinions */}
       <div className="min-h-[270mm] p-2 box-border">
@@ -376,7 +376,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         </div>
       </div>
 
-      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+      <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Pages 7-12: Checklists */}
       {['전략', '마케팅', '재무', '인사', '생산관리', '정보화'].map((cat, catIdx) => {
@@ -427,7 +427,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 </tbody>
               </table>
             </div>
-            <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:hidden" />
+            <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
           </React.Fragment>
         );
       })}
