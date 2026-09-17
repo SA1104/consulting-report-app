@@ -168,62 +168,10 @@ export default function Dashboard() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleDownloadPDF = async () => {
-    setIsPreviewOpen(true);
-    setIsGeneratingPDF(true);
-    
-    try {
-      const html2canvas = (await import('html2canvas-pro')).default;
-      const { jsPDF } = await import('jspdf');
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const element = document.getElementById('print-report');
-      if (!element) { 
-        alert('인쇄 영역을 찾을 수 없습니다.'); 
-        setIsGeneratingPDF(false);
-        return; 
-      }
-
-      const canvas = await html2canvas(element, {
-        scale: 1.5,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 794,
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = pdfWidth / imgWidth;
-      const totalImgHeightInMm = imgHeight * ratio;
-      
-      let heightLeft = totalImgHeightInMm;
-      let position = 0;
-      
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgWidth * ratio);
-      heightLeft -= pdfHeight;
-      
-      while (heightLeft >= 0) {
-        position = heightLeft - totalImgHeightInMm;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgWidth * ratio);
-        heightLeft -= pdfHeight;
-      }
-      
-      pdf.save(`컨설팅보고서_${formData.company || '수진기업'}.pdf`);
-      setIsPreviewOpen(false); // Close modal on success
-    } catch (e) {
-      console.error(e);
-      alert('PDF 생성 중 오류가 발생했습니다.');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
+    // Simply trigger browser native print
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   const handleDownloadWord = async () => {
@@ -1110,10 +1058,10 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                 </p>
                 
                 <div className="flex justify-center gap-6 pt-6">
-                  <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isGeneratingPDF ? <Loader2 className="w-12 h-12 text-red-500 animate-spin" /> : <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />}
+                  <button onClick={handleDownloadPDF} className="flex flex-col items-center justify-center gap-4 p-8 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all w-56 group bg-white shadow-sm hover:shadow-md">
+                    <FileText className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />
                     <div>
-                      <span className="block font-bold text-gray-800 text-lg">{isGeneratingPDF ? 'PDF 생성 중...' : 'PDF 다운로드'}</span>
+                      <span className="block font-bold text-gray-800 text-lg">PDF 다운로드</span>
                       <span className="block text-sm text-gray-500 mt-1">인쇄 및 최종 보고용</span>
                     </div>
                   </button>
@@ -1213,38 +1161,23 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
 
         {/* SCREEN ONLY Print Preview Modal */}
         {isPreviewOpen && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex flex-col z-[100]">
-            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0 relative z-10">
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-80 flex flex-col z-[100] print:hidden">
+            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0">
               <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <Printer className="w-5 h-5 text-blue-600" />
                 인쇄 미리보기 (Print Preview)
               </h2>
               <div className="flex gap-4">
-                <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                  {isGeneratingPDF ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
-                  {isGeneratingPDF ? 'PDF 생성 중...' : '인쇄 / PDF 저장'}
+                <button onClick={() => window.print()} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                  <Printer className="w-4 h-4" /> 인쇄 / PDF 저장
                 </button>
-                <button onClick={() => setIsPreviewOpen(false)} disabled={isGeneratingPDF} className="text-gray-500 hover:bg-gray-100 disabled:opacity-50 px-4 py-2 rounded-lg font-medium transition-colors">
+                <button onClick={() => setIsPreviewOpen(false)} className="text-gray-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition-colors">
                   닫기
                 </button>
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-8 bg-gray-500 relative">
-              {/* Blocking Loading Overlay */}
-              {isGeneratingPDF && (
-                <div className="absolute inset-0 bg-gray-900 bg-opacity-50 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
-                  <div className="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm w-full text-center">
-                    <Loader2 className="w-16 h-16 text-red-500 animate-spin mb-6" />
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">PDF 파일 생성 중</h3>
-                    <p className="text-gray-500">
-                      고해상도 이미지를 처리하고 있습니다.<br/>
-                      브라우저 사양에 따라 10~20초 정도 소요될 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-              )}
-              
+            <div className="flex-1 overflow-y-auto p-8 bg-gray-500">
               {/* Only shown on screen, NOT during actual print */}
               <PrintReport formData={formData} results={results} />
             </div>
