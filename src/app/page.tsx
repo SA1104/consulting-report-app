@@ -1187,8 +1187,8 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
       </div>
 
       {/* PRINT ONLY LAYOUT */}
-      {/* This entirely bypasses all Tailwind flexbox deeply nested wrappers and renders PrintReport at the DOM root during printing */}
-      <div className="hidden print:block w-full bg-white m-0 p-0">
+      {/* This renders off-screen normally to avoid Recharts display:none infinite loop bug, then becomes visible on print */}
+      <div className="fixed left-[-9999px] top-[-9999px] w-[210mm] print:static print:w-full print:bg-white print:m-0 print:p-0">
         <PrintReport formData={formData} results={results} />
       </div>
     </>
