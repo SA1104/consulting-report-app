@@ -363,9 +363,10 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 print:hidden">
-      {/* Sidebar */}
-      <div className="w-full md:w-72 bg-white border-b md:border-b-0 md:border-r border-gray-200 shadow-sm flex flex-col shrink-0">
+    <>
+      <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 print:hidden">
+        {/* Sidebar */}
+        <div className="w-full md:w-72 bg-white border-b md:border-b-0 md:border-r border-gray-200 shadow-sm flex flex-col shrink-0">
         <div className="p-4 md:p-6 border-b border-gray-200">
           <h1 className="text-xl font-bold text-blue-700 flex items-center gap-2">
             <LayoutDashboard className="w-6 h-6" />
@@ -1183,13 +1184,13 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             </div>
           </div>
         )}
+      </div>
 
       {/* PRINT ONLY LAYOUT */}
       {/* This entirely bypasses all Tailwind flexbox deeply nested wrappers and renders PrintReport at the DOM root during printing */}
-      <div className="hidden print:block w-full bg-white m-0 p-0 absolute inset-0">
+      <div className="hidden print:block w-full bg-white m-0 p-0">
         <PrintReport formData={formData} results={results} />
       </div>
-
-    </div>
+    </>
   );
 }
