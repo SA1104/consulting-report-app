@@ -387,18 +387,18 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
               <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6 shrink-0">
                 부문별 진단 체크리스트 - {cat}
               </h2>
-              <div className="flex-1 overflow-hidden">
-                <table className="w-full h-full text-sm border-collapse border-2 border-gray-800 text-center">
+              <div className="flex-1">
+                <table className="w-full h-full text-xs border-collapse border-2 border-gray-800 text-center leading-tight">
                   <thead>
                   <tr className="bg-gray-100 border-b-2 border-gray-800 print:break-inside-avoid">
-                    <th className="border border-gray-400 p-3 w-[15%]">진단항목</th>
-                    <th className="border border-gray-400 p-3 w-[55%]">진단 체크리스트</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">V</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">G</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">N</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">B</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">W</th>
-                    <th className="border border-gray-400 p-2 w-[5%] text-xs">제외</th>
+                    <th className="border border-gray-400 p-1.5 w-[15%]">진단항목</th>
+                    <th className="border border-gray-400 p-1.5 w-[55%]">진단 체크리스트</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">V</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">G</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">N</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">B</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">W</th>
+                    <th className="border border-gray-400 p-1 w-[5%] text-[10px]">제외</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -408,16 +408,16 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                     <React.Fragment key={item.id}>
                       {showSubcategory && (
                         <tr className="bg-gray-50 border-b border-gray-400 print:break-inside-avoid">
-                          <td colSpan={8} className="p-2 font-bold text-left text-gray-800">
+                          <td colSpan={8} className="p-1.5 font-bold text-left text-gray-800">
                             ■ {item.subcategory}
                           </td>
                         </tr>
                       )}
                       <tr className="border-b border-gray-400 print:break-inside-avoid text-left">
-                        <td className="border border-gray-400 p-3 text-center font-medium">{item.id}</td>
-                        <td className="border border-gray-400 p-3">{item.question}</td>
+                        <td className="border border-gray-400 p-1.5 text-center font-medium">{item.id}</td>
+                        <td className="border border-gray-400 p-1.5">{item.question}</td>
                         {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map((val, vIdx) => (
-                          <td key={val} className="border border-gray-400 p-2 text-center font-bold text-blue-800">
+                          <td key={val} className="border border-gray-400 p-1 text-center font-bold text-blue-800">
                             {formData.checklistScores?.[item.id] === val ? 'O' : ''}
                           </td>
                         ))}
@@ -434,83 +434,6 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         );
       })}
 
-      {/* Page 13: Guide Page */}
-      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-2">재창업패키지 지원사업 안내</h2>
-        
-        <div className="space-y-8">
-          <div className="print:break-inside-avoid">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-800 inline-block"></span>
-              1. 사업 개요
-            </h3>
-            <div className="bg-gray-50 border border-gray-300 rounded-sm p-5 space-y-2 text-sm leading-relaxed">
-              <p>• <strong>사업 목적:</strong> 사업실패 경험이 있는 (예비)재창업자의 재기를 지원하여 재도전 문화 확산 및 경제 활력 제고</p>
-              <p>• <strong>지원 대상:</strong> 사업실패 경험이 있는 (예비)재창업자 또는 재창업 기업 (업력 7년 이내)</p>
-              <p>• <strong>지원 규모:</strong> 재창업사업화 자금 최대 1억원 (업력 3년 이상 최대 2억원)</p>
-              <p>• <strong>지원 기간:</strong> 협약일로부터 12개월 이내 (최대 18개월까지 연장 가능)</p>
-            </div>
-          </div>
-
-          <div className="print:break-inside-avoid">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-800 inline-block"></span>
-              2. 지원 내용
-            </h3>
-            <div className="bg-gray-50 border border-gray-300 rounded-sm p-5 space-y-2 text-sm leading-relaxed">
-              <p>• <strong>재창업사업화:</strong> 시제품 제작, 지식재산권 취득, 마케팅 활동 등 재창업 사업화에 소요되는 자금 지원</p>
-              <p>• <strong>재기교육:</strong> 실패원인 분석, 재창업 역량 강화를 위한 맞춤형 교육 프로그램 제공</p>
-              <p>• <strong>멘토링:</strong> 분야별 전문가 매칭을 통한 1:1 밀착 멘토링 제공</p>
-              <p>• <strong>컨설팅:</strong> 경영, 기술, 법률, 회계 등 재창업 전 과정에 필요한 전문 컨설팅 지원</p>
-            </div>
-          </div>
-
-          <div className="print:break-inside-avoid">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-800 inline-block"></span>
-              3. 컨설팅 진행 절차
-            </h3>
-            <div className="flex items-center justify-between bg-gray-50 border border-gray-300 rounded-sm p-6">
-              {['수요조사\n및 접수', '컨설턴트\n매칭', '현장방문\n진단', '보고서\n작성', '결과\n피드백'].map((step, i) => (
-                <React.Fragment key={i}>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                      i <= 3 ? 'bg-blue-600' : 'bg-gray-400'
-                    }`}>{i + 1}</div>
-                    <span className="text-xs text-center font-bold whitespace-pre-line">{step}</span>
-                  </div>
-                  {i < 4 && <span className="text-2xl text-gray-400">→</span>}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-
-          <div className="print:break-inside-avoid">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-800 inline-block"></span>
-              4. 유의사항
-            </h3>
-            <div className="border-2 border-gray-800 rounded-sm p-5 space-y-2 text-sm leading-relaxed font-bold">
-              <p>• 본 컨설팅 보고서는 「중소벤처기업부 재창업패키지 지원사업」의 일환으로 작성되었습니다.</p>
-              <p>• 보고서 내용은 수진기업이 제공한 자료 및 현장 인터뷰를 기반으로 작성되며, 제공된 자료의 진위여부에 대한 책임은 수진기업에 있습니다.</p>
-              <p>• 경영진단 결과는 참고 목적이며, 최종 의사결정은 경영자의 판단에 따릅니다.</p>
-              <p>• 본 보고서의 무단 복제 및 배포를 금합니다.</p>
-            </div>
-          </div>
-
-          <div className="print:break-inside-avoid">
-            <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-800 inline-block"></span>
-              5. 문의처
-            </h3>
-            <div className="bg-gray-50 border border-gray-300 rounded-sm p-5 space-y-1 text-sm leading-relaxed">
-              <p>• <strong>중소벤처기업부 재도전종합지원센터:</strong> 1357 (중소기업 통합콜센터)</p>
-              <p>• <strong>재창업패키지 전담기관:</strong> 중소벤처기업진흥공단</p>
-              <p>• <strong>홈페이지:</strong> www.k-startup.go.kr</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
