@@ -87,6 +87,7 @@ export default function Dashboard() {
 
   // Auto-save to localStorage
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [savedCompanies, setSavedCompanies] = useState<string[]>([]);
   
   useEffect(() => {
     const saved = localStorage.getItem('consulting_form_data');
@@ -98,11 +99,40 @@ export default function Dashboard() {
         console.error('Failed to load saved data:', e);
       }
     }
+    const listStr = localStorage.getItem('consulting_saved_list') || '[]';
+    try {
+      setSavedCompanies(JSON.parse(listStr));
+    } catch(e) {}
   }, []);
+
+  const loadCompany = (companyName: string) => {
+    if (!companyName) return;
+    const saved = localStorage.getItem(`consulting_report_${companyName}`);
+    if (saved) {
+      setFormData(JSON.parse(saved));
+      alert(`${companyName} 데이터를 불러왔습니다.`);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem('consulting_form_data', JSON.stringify(formData));
+      
+      if (formData.company && formData.company.trim() !== '') {
+        const companyKey = `consulting_report_${formData.company}`;
+        localStorage.setItem(companyKey, JSON.stringify(formData));
+        
+        const listStr = localStorage.getItem('consulting_saved_list') || '[]';
+        try {
+          let list = JSON.parse(listStr);
+          if (!list.includes(formData.company)) {
+            list.push(formData.company);
+            localStorage.setItem('consulting_saved_list', JSON.stringify(list));
+            setSavedCompanies(list);
+          }
+        } catch(e) {}
+      }
+
       setLastSaved(new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }));
     }, 1000);
     return () => clearTimeout(timer);
@@ -116,7 +146,11 @@ export default function Dashboard() {
 
   const handleRatioChange = (index: number, field: string, value: string) => {
     const updatedRatios = [...formData.ratios];
-    updatedRatios[index] = { ...updatedRatios[index], [field]: Number(value) || 0 };
+    if (field === 'year') {
+      updatedRatios[index] = { ...updatedRatios[index], [field]: value };
+    } else {
+      updatedRatios[index] = { ...updatedRatios[index], [field]: Number(value) || 0 };
+    }
     setFormData({ ...formData, ratios: updatedRatios });
   };
 
@@ -240,7 +274,7 @@ export default function Dashboard() {
         new TableRow({ children: [cell('자기자본비율 (%)'), ...formData.ratios.map(r => cell(String(r.equityRatio)))] }),
         new TableRow({ children: [cell('매출액순이익률 (%)'), ...formData.ratios.map(r => cell(String(r.preTaxMargin)))] }),
         new TableRow({ children: [cell('부가가치율 (%)'), ...formData.ratios.map(r => cell(String(r.valueAdded)))] }),
-        new TableRow({ children: [cell('매출액증가율 (%)'), ...formData.ratios.map(r => cell(String(r.salesGrowth)))] }),
+        new TableRow({ children: [cell('차입금 평균 이자율 (%)'), ...formData.ratios.map(r => cell(String(r.salesGrowth)))] }),
       ];
 
       // Section 4: Checklist Results
@@ -420,6 +454,16 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             )}
           </div>
           <div className="flex items-center flex-wrap gap-2 md:gap-4 w-full md:w-auto mt-2 md:mt-0">
+            {savedCompanies.length > 0 && (
+              <select 
+                onChange={(e) => loadCompany(e.target.value)} 
+                className="text-xs border border-gray-300 rounded px-2 py-1 bg-white hover:bg-gray-50 focus:outline-none focus:border-blue-500"
+                defaultValue=""
+              >
+                <option value="" disabled>과거 내역 불러오기...</option>
+                {savedCompanies.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
             <button onClick={() => setIsPreviewOpen(true)} className="text-gray-500 hover:text-blue-600 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium transition-colors">
               <Printer className="w-4 h-4" /> 인쇄 미리보기
             </button>
@@ -657,11 +701,10 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                               <th className="px-3 py-3 text-center font-medium text-gray-700 border border-gray-300">비율명</th>
                               {formData.ratios.map((r, i) => (
                                 <th key={i} className="px-3 py-3 text-center font-medium text-gray-700 border border-gray-300">
-                                  {i === formData.ratios.length - 1 ? (
-                                    <span>{r.year}</span>
-                                  ) : (
-                                    <span><input type="text" className="w-16 font-semibold bg-transparent border-b border-gray-400 focus:border-blue-500 outline-none text-center" defaultValue={r.year} />년</span>
-                                  )}
+                                  <div className="flex items-center justify-center gap-1">
+                                    <input type="text" value={r.year} onChange={(e) => handleRatioChange(i, 'year', e.target.value)} className="w-16 font-semibold bg-transparent border-b border-gray-400 focus:border-blue-500 outline-none text-center" />
+                                    <span>년</span>
+                                  </div>
                                 </th>
                               ))}
                             </tr>
@@ -676,7 +719,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                               ))}
                             </tr>
                             <tr>
-                              <td className="px-3 py-4 text-gray-700 text-center font-medium border border-gray-300">매출액세전계속사업이익률</td>
+                              <td className="px-3 py-4 text-gray-700 text-center font-medium border border-gray-300">재고 자산 회전율</td>
                               {formData.ratios.map((r, i) => (
                                 <td key={`ptm-${i}`} className="px-3 py-2 border border-gray-300">
                                   <input type="number" value={r.preTaxMargin} onChange={(e) => handleRatioChange(i, 'preTaxMargin', e.target.value)} className="w-full px-2 py-1 border border-gray-200 rounded text-right" />
@@ -692,7 +735,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                               ))}
                             </tr>
                             <tr>
-                              <td className="px-3 py-4 text-gray-700 text-center font-medium border border-gray-300">매출액증가율</td>
+                              <td className="px-3 py-4 text-gray-700 text-center font-medium border border-gray-300">차입금 평균 이자율</td>
                               {formData.ratios.map((r, i) => (
                                 <td key={`sg-${i}`} className="px-3 py-2 border border-gray-300">
                                   <input type="number" value={r.salesGrowth} onChange={(e) => handleRatioChange(i, 'salesGrowth', e.target.value)} className="w-full px-2 py-1 border border-gray-200 rounded text-right" />
@@ -715,9 +758,9 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                               <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                               <Line type="monotone" dataKey="equityRatio" name="자기자본비율" stroke="#3b82f6" strokeWidth={2} dot={{r: 4}} activeDot={{r: 6}} />
-                              <Line type="monotone" dataKey="preTaxMargin" name="매출액세전계속사업이익률" stroke="#f59e0b" strokeWidth={2} />
+                              <Line type="monotone" dataKey="preTaxMargin" name="재고 자산 회전율" stroke="#f59e0b" strokeWidth={2} />
                               <Line type="monotone" dataKey="valueAdded" name="부가가치율" stroke="#8b5cf6" strokeWidth={2} />
-                              <Line type="monotone" dataKey="salesGrowth" name="매출액증가율" stroke="#10b981" strokeWidth={2} />
+                              <Line type="monotone" dataKey="salesGrowth" name="차입금 평균 이자율" stroke="#10b981" strokeWidth={2} />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
@@ -802,7 +845,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             )}
 
             {/* Step 4: Checklist */}
-            {currentStep === 4 && (
+            {currentStep === 5 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col min-h-[600px]">
                 {/* Category Tabs */}
                 <div className="flex border-b border-gray-200 bg-gray-50 px-4 pt-4 gap-2 overflow-x-auto">
@@ -884,7 +927,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             )}
 
             {/* Step 5: Results */}
-            {currentStep === 5 && (
+            {currentStep === 4 && (
               <div className="space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="border-b border-gray-200 bg-gray-50 px-6 py-4"><h3 className="text-lg font-medium text-gray-800">부문별 경영진단 결과</h3></div>
@@ -986,7 +1029,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             )}
 
             {/* Step 6: Guide Pages (13~15p) */}
-            {currentStep === 6 && (
+            {currentStep === 999 && (
               <div className="space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-900 pb-3">재창업패키지 지원사업 안내</h2>
@@ -1053,7 +1096,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
             )}
 
             {/* Step 7: Export */}
-            {currentStep === 7 && (
+            {currentStep === 6 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center space-y-6">
                 <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Download className="w-10 h-10" />

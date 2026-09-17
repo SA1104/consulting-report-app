@@ -207,7 +207,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                   {formData.ratios?.map((r: any, i: number) => <td key={i} className="p-2 border border-gray-400">{r.valueAdded}</td>)}
                 </tr>
                 <tr>
-                  <td className="p-2 border border-gray-400 font-bold bg-gray-50">매출액증가율 (%)</td>
+                  <td className="p-2 border border-gray-400 font-bold bg-gray-50">차입금 평균 이자율 (%)</td>
                   {formData.ratios?.map((r: any, i: number) => <td key={i} className="p-2 border border-gray-400">{r.salesGrowth}</td>)}
                 </tr>
               </tbody>
@@ -233,7 +233,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 <Line name="부가가치율" type="monotone" dataKey="valueAdded" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="valueAdded" position="top" fontSize={12} fill="#f59e0b" />
                 </Line>
-                <Line name="매출액증가율" type="monotone" dataKey="salesGrowth" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
+                <Line name="차입금 평균 이자율" type="monotone" dataKey="salesGrowth" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false}>
                   <LabelList dataKey="salesGrowth" position="top" fontSize={12} fill="#10b981" />
                 </Line>
               </LineChart>
