@@ -122,7 +122,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
           </table>
           <p className="text-right text-xs text-gray-600 mt-1 mb-4">(단위: 백만원)</p>
 
-          <div className="flex gap-4 h-[180px]">
+          <div className="flex gap-4 h-[180px] print:break-inside-avoid">
             {/* Balance Sheet Chart */}
             <div className="flex-1 flex flex-col justify-center">
               <h4 className="text-center font-bold text-xs mb-1 text-gray-700">대차대조표 (자산/부채/자본)</h4>
@@ -297,7 +297,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
           부문별 경영진단 결과
         </h3>
         
-        <div className="flex gap-8 mb-10 h-[350px]">
+        <div className="flex gap-8 mb-10 h-[350px] print:break-inside-avoid">
           <div className="flex-1 flex flex-col justify-center">
             <table className="w-full text-center border-collapse border-2 border-gray-800 text-sm">
               <thead className="bg-gray-100 border-b-2 border-gray-800">
@@ -387,43 +387,45 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
               <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
                 부문별 진단 체크리스트 - {cat}
               </h2>
-              <div className="w-full text-sm border-2 border-gray-800">
-                {/* Header Row */}
-                <div className="flex bg-gray-100 border-b-2 border-gray-800 font-bold print:break-inside-avoid">
-                  <div className="border-r border-gray-400 p-3 w-[15%] text-center flex items-center justify-center">진단항목</div>
-                  <div className="border-r border-gray-400 p-3 w-[55%] text-center flex items-center justify-center">진단 체크리스트</div>
-                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">V</div>
-                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">G</div>
-                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">N</div>
-                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">B</div>
-                  <div className="border-r border-gray-400 p-2 w-[5%] text-center text-xs flex items-center justify-center">W</div>
-                  <div className="p-2 w-[5%] text-center text-xs flex items-center justify-center">제외</div>
-                </div>
-                {/* Body Rows */}
-                <div className="flex flex-col">
+              <table className="w-full text-sm border-collapse border-2 border-gray-800 text-center">
+                <thead>
+                  <tr className="bg-gray-100 border-b-2 border-gray-800 print:break-inside-avoid">
+                    <th className="border border-gray-400 p-3 w-[15%]">진단항목</th>
+                    <th className="border border-gray-400 p-3 w-[55%]">진단 체크리스트</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">V</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">G</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">N</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">B</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">W</th>
+                    <th className="border border-gray-400 p-2 w-[5%] text-xs">제외</th>
+                  </tr>
+                </thead>
+                <tbody>
                 {catItems.map((item, idx) => {
                   const showSubcategory = idx === 0 || catItems[idx - 1].subcategory !== item.subcategory;
                   return (
                     <React.Fragment key={item.id}>
                       {showSubcategory && (
-                        <div className="bg-gray-200 border-b border-gray-400 p-2 font-bold text-gray-800 print:break-inside-avoid print:break-after-avoid">
-                          ■ {item.subcategory}
-                        </div>
+                        <tr className="bg-gray-50 border-b border-gray-400 print:break-inside-avoid">
+                          <td colSpan={8} className="p-2 font-bold text-left text-gray-800">
+                            ■ {item.subcategory}
+                          </td>
+                        </tr>
                       )}
-                      <div className="flex border-b border-gray-400 last:border-b-0 print:break-inside-avoid checklist-row">
-                        <div className="border-r border-gray-400 p-3 w-[15%] text-center font-medium flex items-center justify-center">{item.id}</div>
-                        <div className="border-r border-gray-400 p-3 w-[55%] flex items-center">{item.question}</div>
+                      <tr className="border-b border-gray-400 print:break-inside-avoid text-left">
+                        <td className="border border-gray-400 p-3 text-center font-medium">{item.id}</td>
+                        <td className="border border-gray-400 p-3">{item.question}</td>
                         {(['V', 'G', 'N', 'B', 'W', 'X'] as const).map((val, vIdx) => (
-                          <div key={val} className={`${vIdx < 5 ? 'border-r border-gray-400' : ''} p-2 w-[5%] text-center font-bold text-blue-800 flex items-center justify-center`}>
-                            {formData.checklistScores?.[item.id] === val ? '✓' : ''}
-                          </div>
+                          <td key={val} className="border border-gray-400 p-2 text-center font-bold text-blue-800">
+                            {formData.checklistScores?.[item.id] === val ? 'O' : ''}
+                          </td>
                         ))}
-                      </div>
+                      </tr>
                     </React.Fragment>
                   );
                 })}
-                </div>
-              </div>
+                </tbody>
+              </table>
             </div>
             <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
           </React.Fragment>
