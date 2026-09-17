@@ -165,13 +165,18 @@ export default function Dashboard() {
 
   const results = calculateResults();
   
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isPreparingPrint, setIsPreparingPrint] = useState(false);
 
-  const handleDownloadPDF = async () => {
-    // Simply trigger browser native print
+  const handleDownloadPDF = () => {
+    setIsPreparingPrint(true);
+    // Give React time to render PrintReport on screen (covered by the loading screen)
     setTimeout(() => {
       window.print();
-    }, 100);
+      // The print dialog blocks JS execution. When it closes, we reset the state.
+      setTimeout(() => {
+        setIsPreparingPrint(false);
+      }, 500);
+    }, 1000);
   };
 
   const handleDownloadWord = async () => {
@@ -364,7 +369,7 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
 
   return (
     <>
-      <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 print:hidden">
+      <div className={`flex flex-col md:flex-row h-screen bg-gray-50 font-sans text-gray-900 print:hidden ${isPreparingPrint ? 'hidden' : ''}`}>
         {/* Sidebar */}
         <div className="w-full md:w-72 bg-white border-b md:border-b-0 md:border-r border-gray-200 shadow-sm flex flex-col shrink-0">
         <div className="p-4 md:p-6 border-b border-gray-200">
@@ -1186,11 +1191,21 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
         )}
       </div>
 
-      {/* PRINT ONLY LAYOUT */}
-      {/* This renders off-screen normally to avoid Recharts display:none infinite loop bug, then becomes visible on print */}
-      <div className="fixed left-[-9999px] top-[-9999px] w-[210mm] print:static print:w-full print:bg-white print:m-0 print:p-0">
-        <PrintReport formData={formData} results={results} />
-      </div>
+      {isPreparingPrint && (
+        <>
+          {/* VISIBLE Loading Screen - Hides PrintReport from user's eyes on screen, but is hidden during actual print */}
+          <div className="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center print:hidden">
+            <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800">인쇄 화면 준비 중...</h2>
+            <p className="text-gray-500 mt-2">고해상도 차트를 렌더링하고 있습니다.</p>
+          </div>
+
+          {/* Actual Print Layout - Rendered normally on screen (behind loading) and printed */}
+          <div className="w-full min-w-[210mm] bg-white m-0 p-0">
+            <PrintReport formData={formData} results={results} />
+          </div>
+        </>
+      )}
     </>
   );
 }
