@@ -86,7 +86,7 @@ export default function Dashboard() {
 
   // Auto-save to localStorage
   const [lastSaved, setLastSaved] = useState<string | null>(null);
-  const [savedCompanies, setSavedCompanies] = useState<string[]>([]);
+  const [savedCompanies, setSavedCompanies] = useState<any[]>([]);
   
   useEffect(() => {
     const saved = localStorage.getItem('consulting_form_data');
@@ -109,29 +109,40 @@ export default function Dashboard() {
     const saved = localStorage.getItem(`consulting_report_${companyName}`);
     if (saved) {
       setFormData(JSON.parse(saved));
-      alert(`${companyName} 데이터를 불러왔습니다.`);
+      alert(`[${companyName}] 데이터를 불러왔습니다.`);
     }
+  };
+
+  const handleManualSave = () => {
+    const defaultName = formData.company || '새 기업';
+    const saveName = window.prompt('저장할 이름을 지정해주세요. (같은 이름이면 덮어씁니다)', defaultName);
+    if (!saveName) return;
+
+    const companyKey = `consulting_report_${saveName}`;
+    localStorage.setItem(companyKey, JSON.stringify(formData));
+
+    const listStr = localStorage.getItem('consulting_saved_list') || '[]';
+    try {
+      let list = JSON.parse(listStr);
+      // Migrate old string arrays if any
+      list = list.map((item: any) => typeof item === 'string' ? { name: item, date: '' } : item);
+      
+      const existingIdx = list.findIndex((item: any) => item.name === saveName);
+      const dateStr = new Date().toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+      if (existingIdx >= 0) {
+        list[existingIdx].date = dateStr;
+      } else {
+        list.push({ name: saveName, date: dateStr });
+      }
+      localStorage.setItem('consulting_saved_list', JSON.stringify(list));
+      setSavedCompanies(list);
+      alert(`[${saveName}] 저장되었습니다.`);
+    } catch(e) {}
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem('consulting_form_data', JSON.stringify(formData));
-      
-      if (formData.company && formData.company.trim() !== '') {
-        const companyKey = `consulting_report_${formData.company}`;
-        localStorage.setItem(companyKey, JSON.stringify(formData));
-        
-        const listStr = localStorage.getItem('consulting_saved_list') || '[]';
-        try {
-          let list = JSON.parse(listStr);
-          if (!list.includes(formData.company)) {
-            list.push(formData.company);
-            localStorage.setItem('consulting_saved_list', JSON.stringify(list));
-            setSavedCompanies(list);
-          }
-        } catch(e) {}
-      }
-
       setLastSaved(new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }));
     }, 1000);
     return () => clearTimeout(timer);
@@ -455,14 +466,31 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
           <div className="flex items-center flex-wrap gap-2 md:gap-4 w-full md:w-auto mt-2 md:mt-0">
             {savedCompanies.length > 0 && (
               <select 
-                onChange={(e) => loadCompany(e.target.value)} 
-                className="text-xs border border-gray-300 rounded px-2 py-1 bg-white hover:bg-gray-50 focus:outline-none focus:border-blue-500"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    loadCompany(e.target.value);
+                    e.target.value = "";
+                  }
+                }} 
+                className="text-xs border border-gray-300 rounded px-2 py-1.5 bg-white hover:bg-gray-50 focus:outline-none focus:border-blue-500 max-w-[200px] truncate"
                 defaultValue=""
               >
                 <option value="" disabled>과거 내역 불러오기...</option>
-                {savedCompanies.map(c => <option key={c} value={c}>{c}</option>)}
+                {savedCompanies.map((c: any) => {
+                  const name = typeof c === 'string' ? c : c.name;
+                  const date = typeof c === 'string' ? '' : c.date;
+                  return (
+                    <option key={name} value={name}>
+                      {name} {date ? `(${date})` : ''}
+                    </option>
+                  );
+                })}
               </select>
             )}
+            <button onClick={handleManualSave} className="text-gray-600 hover:text-green-600 flex items-center gap-1 text-xs font-medium transition-colors border border-gray-200 px-2.5 py-1.5 rounded-lg bg-white shadow-sm hover:bg-green-50">
+              <span className="text-[10px]">💾</span> 이름 지정 저장
+            </button>
+            <div className="w-px h-4 bg-gray-300 mx-1 hidden md:block"></div>
             <button onClick={() => setIsPreviewOpen(true)} className="text-gray-500 hover:text-blue-600 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium transition-colors">
               <Printer className="w-4 h-4" /> 인쇄 미리보기
             </button>
