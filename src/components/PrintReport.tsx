@@ -358,21 +358,21 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
       <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
 
       {/* Page 6: Final Opinions */}
-      <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
-        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 mt-4">
+      <div className="h-[277mm] p-2 box-border flex flex-col">
+        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 mt-4 shrink-0">
           <span className="w-2 h-2 bg-blue-800 inline-block"></span>
           경영개선 과제 선정 및 실행방안
         </h3>
-        <div className="mb-10 border-2 border-gray-800 rounded-sm">
-          <div className="p-6 whitespace-pre-wrap min-h-[250px] leading-relaxed">{formData.aiTasks || '내용 없음'}</div>
+        <div className="mb-6 border-2 border-gray-800 rounded-sm flex-1 overflow-hidden">
+          <div className="p-6 whitespace-pre-wrap leading-relaxed h-full">{formData.aiTasks || '내용 없음'}</div>
         </div>
 
-        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 shrink-0">
           <span className="w-2 h-2 bg-blue-800 inline-block"></span>
           종합 의견
         </h3>
-        <div className="border-2 border-gray-800 rounded-sm">
-          <div className="p-6 whitespace-pre-wrap min-h-[250px] leading-relaxed">{formData.aiOpinion || '내용 없음'}</div>
+        <div className="border-2 border-gray-800 rounded-sm flex-1 overflow-hidden">
+          <div className="p-6 whitespace-pre-wrap leading-relaxed h-full">{formData.aiOpinion || '내용 없음'}</div>
         </div>
       </div>
 
@@ -383,12 +383,13 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
         const catItems = checklistData.filter(c => c.category === cat);
         return (
           <React.Fragment key={cat}>
-            <div className="min-h-[270mm] print-page-container print:h-auto p-2 box-border">
-              <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6">
+            <div className="h-[277mm] p-2 box-border flex flex-col">
+              <h2 className="text-2xl font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-6 shrink-0">
                 부문별 진단 체크리스트 - {cat}
               </h2>
-              <table className="w-full text-sm border-collapse border-2 border-gray-800 text-center">
-                <thead>
+              <div className="flex-1 overflow-hidden">
+                <table className="w-full h-full text-sm border-collapse border-2 border-gray-800 text-center">
+                  <thead>
                   <tr className="bg-gray-100 border-b-2 border-gray-800 print:break-inside-avoid">
                     <th className="border border-gray-400 p-3 w-[15%]">진단항목</th>
                     <th className="border border-gray-400 p-3 w-[55%]">진단 체크리스트</th>
@@ -426,6 +427,7 @@ export const PrintReport = ({ formData, results }: { formData: any, results: any
                 })}
                 </tbody>
               </table>
+              </div>
             </div>
             <div className="page-break my-8 border-b-2 border-dashed border-gray-300 print:border-none print:my-0" />
           </React.Fragment>
