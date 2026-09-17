@@ -11,9 +11,8 @@ const steps = [
   { id: 'overview', title: '기업 현황 및 재무' },
   { id: 'environment', title: '환경 분석' },
   { id: 'capabilities', title: '내부역량 및 사업성' },
-  { id: 'checklist', title: '경영진단 체크리스트' },
   { id: 'results', title: '진단 결과 (AI)' },
-  { id: 'guide', title: '안내문 (13~15p)' },
+  { id: 'checklist', title: '경영진단 체크리스트' },
   { id: 'export', title: '문서 내보내기' },
 ];
 
