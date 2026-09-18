@@ -150,7 +150,11 @@ export default function Dashboard() {
 
   const handleFinancialChange = (index: number, field: string, value: string) => {
     const updatedFinancials = [...formData.financials];
-    updatedFinancials[index] = { ...updatedFinancials[index], [field]: Number(value) || 0 };
+    if (field === 'year') {
+      updatedFinancials[index] = { ...updatedFinancials[index], [field]: value };
+    } else {
+      updatedFinancials[index] = { ...updatedFinancials[index], [field]: Number(value) || 0 };
+    }
     setFormData({ ...formData, financials: updatedFinancials });
   };
 
@@ -628,7 +632,10 @@ ${results.map(r => `[${r.category} 부문]: ${r.score}점 (${r.grade}등급)`).j
                               <th className="px-3 py-3 text-center font-medium text-gray-700 border border-gray-300">계정과목</th>
                               {formData.financials.map((f, i) => (
                                 <th key={i} className="px-3 py-3 text-center border border-gray-300">
-                                  <input type="text" className="w-16 font-semibold bg-transparent border-b border-gray-400 focus:border-blue-500 outline-none text-center" defaultValue={f.year} />년
+                                  <div className="flex items-center justify-center gap-1">
+                                    <input type="text" className="w-16 font-semibold bg-transparent border-b border-gray-400 focus:border-blue-500 outline-none text-center" value={f.year} onChange={(e) => handleFinancialChange(i, 'year', e.target.value)} />
+                                    <span>년</span>
+                                  </div>
                                 </th>
                               ))}
                             </tr>
